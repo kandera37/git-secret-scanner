@@ -1,0 +1,49 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+
+# ===== Virtual envs =====
+.venv/
+venv/
+env/
+ENV/
+pip-wheel-metadata/
+
+# ===== IDE =====
+.idea/
+vscode/
+*.iml
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Secrets / env =====
+.env
+.env.*
+!.env.example
+
+# ===== Reports / outputs =====
+report.json
+report_*.json
+outputs/
+*.log
+
+# ===== Temp / cache =====
+.tmp/
+tmp/
+.temp/
+temp/
+.cache/
+.mypy_cache/
+.pytest_cache/
+
+# ===== Coverage =====
+.coverage
+htmlcov/
