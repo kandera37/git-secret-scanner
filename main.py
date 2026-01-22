@@ -80,11 +80,16 @@ def main() -> None:
         "scanned_commits": args.n,
         "findings": final_findings,
     }
-
-    with open(args.out, "w", encoding="utf-8") as out_f:
-        json.dump(report, out_f, indent=2)
-
-    print(f"Wrote report to {args.out}")
+    if not findings:
+        report ={
+            "repository": args.repo,
+            "scanned_commits": args.n,
+            "findings": [],
+        }
+        with open(args.out, "w", encoding="utf-8") as out_f:
+            json.dump(report, out_f, indent=2)
+        print(f"Wrote report to {args.out} (no findings, LLM not called)")
+        return
 
 if __name__ == "__main__":
     main()
