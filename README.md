@@ -1,12 +1,24 @@
 # Git Secret Scanner
 
-This is a small CLI tool that scans the last **N** Git commits for hardcoded secrets (passwords, tokens, secret keys).  
-It analyzes Git diffs and commit messages using simple regex rules and entropy-based heuristics and writes the results to a JSON report.
+Small CLI tool that scans the last N Git commits for potential hardcoded secrets (passwords, tokens, secrets) using regex + entropy and an LLm for secondary review.
+
+## Features
+
+- Scans last **N commits** (diffs + commit messages)
+- Detects potential secrets using:
+    - regex-based rules
+    - Shannon entropy to estimate randomness
+- Optionally sends low/medium confidence findings to an LLM for re-classification
+- Works with:
+    - local Git repositories
+    - remote Git URLs (via `git clone` into a temporary directory)
+- Produces a JSON report with all findings
 
 ## Requirements
 
 - Python 3.10+  
 - `git` installed and available in your `$PATH`
+- OpenAI API key (for real LLM classification)
 
 ## Installation
 
@@ -18,63 +30,80 @@ cd <YOUR_REPO_DIR>
 # pip install -r requirements.txt  # optional, if you add dependencies later
 ```
 
+## Configuration
+
+The tool reads OpenAI settings from environment variables.
+You can use .env file (not commited to Git) based on .env.example:
+
+```dotenv
+OPENAI_API_KEY=put_key_here
+OPENAI_MODEL=gpt-4o-mini
+```
+
+By default, the code uses `gpt-4o-mini`, but you can override it via CLI.
+
 ## Usage
 
-Run the tool from the command line:
+Basic usage with a local repository:
 
 ```bash
-python3 main.py --repo <path_to_repo> --n <number_of_commits> --out <report_path>
+python3 main.py \
+  --repo /path/to/local/repo \
+  --n 5 \
+  --out report.json
 ```
 
-Example:
+Usage with a remote Git URL:
 
 ```bash
-python3 main.py --repo git_test_scanner --n 3 --out report.json
+--repo /path/to/local/repo \
+  --n 5 \
+  --min-confidence medium \
+  --llm-model gpt-4o-mini \
+  --out report.json
 ```
 
-Arguments:
+Where:
 
-- `--repo` – path to the local Git repository to scan  
-- `--n` – how many last commits to scan (must be > 0)  
-- `--out` – path to the JSON report file (default: `report.json`)
+- `--min-confidence` — minimal confidence level **to skip** LLM review.
+    - Findings with `confidence` <= `min-confidence` are sent to the LLM.
+    - Valid values: low, medium, high.
+- `--llm-model` — OpenAI model name (default: gpt-4o-mini).
 
 ## Output format
 
-The tool writes a single JSON file with the following structure:
+The tool writes a JSON report like:
 
 ```json
 {
-  "repository": "git_test_scanner",
+  "repository": "https://github.com/user/repo.git",
   "scanned_commits": 3,
   "findings": [
     {
-      "commit_hash": "da17cc5efef46b8302802f81d7e5c185fe417516",
-      "file_path": "testik.txt",
-      "line": 18,
+      "commit_hash": "da17cc5...",
+      "file_path": "src/app.py",
+      "line": 42,
       "snippet": "password = \"123456\"",
       "type": "hardcoded_password",
       "confidence": "medium",
-      "rationale": "Added line in diff matches regex 'password assignment' (entropy= 3.93)"
+      "rationale": "Added line in diff matches regex 'password assignment' (entropy= 3.93)",
+      "llm_is_secret": true,
+      "llm_type": "hardcoded_password",
+      "llm_confidence": "high",
+      "llm_comment": "Looks like a real hardcoded password."
     }
   ]
 }
 ```
 
-Each finding contains:
+Fields:
+- `type / confidence / rationale` — raw detector output (regex + entropy).
+- `llm_*` — additional classification from the LLM (if enabled).
 
-- `commit_hash` – Git commit hash where the secret was found  
-- `file_path` – file path or `"COMMIT_MESSAGE"` for commit messages  
-- `line` – line number in the diff or text  
-- `snippet` – the exact line with a potential secret  
-- `type` – type of secret (for example, `hardcoded_password`, `hardcoded_token`)  
-- `confidence` – `low`, `medium` or `high` based on entropy  
-- `rationale` – short explanation of why this line was flagged
-
-## Future work (LLM integration)
-
-Right now the tool only uses regex and entropy-based heuristics.  
-Next steps:
-
-- send suspicious lines to an LLM for deeper analysis  
-- reduce false positives  
-- classify findings by severity
+Project structure:
+- `main.py` — CLI entry point, argument parsing, report writing
+- `git_utils.py` — Git interaction (log, show, clone, commit messages)
+- `scanner.py` — regex + entropy-based detectors for diffs and text
+- `llm_utils.py` — candidate selection, LLM payload building, OpenAI call, merging results
+- `.env.example` — example of environment configuration
+- `requirements.txt` — Python dependencies
