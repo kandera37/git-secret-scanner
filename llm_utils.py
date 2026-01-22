@@ -1,5 +1,4 @@
 from typing import Literal
-from unittest.mock import DEFAULT
 
 from pydantic import BaseModel, Field
 from openai import OpenAI
@@ -122,7 +121,7 @@ def build_llm_prompt() -> str:
         "        {\n"
         '           "id": string, \n'
         '           "is_secret": boolean,\n'
-        '           "llm_type": one of ["hardcoded_password", "hardcoded_token", "hardcoded_secret","not_a_secret"]\n'
+        '           "llm_type": one of ["hardcoded_password", "hardcoded_token", "hardcoded_secret", "not_a_secret"]\n'
         '           "llm_confidence": one of ["low","medium","high"],\n'
         '           "llm_comment": string,\n'
         "       }\n"
