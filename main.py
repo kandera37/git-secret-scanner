@@ -51,7 +51,7 @@ def main() -> None:
         repo_path, tmp = prepare_repo(args.repo)
         # 2. Analyze commits using the resolved repo_path
         findings = analyze_last_n_commits(repo_path, args.n)
-    except ValueError as e:
+    except (ValueError, RuntimeError) as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
     except subprocess.CalledProcessError as e:
