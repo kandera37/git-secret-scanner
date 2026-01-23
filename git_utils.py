@@ -104,7 +104,7 @@ def ensure_valid_repo(repo_path: str) -> None:
         raise ValueError(f"Repository path does not exist or is not a directory: {repo_path}")
 
     git_dir = os.path.join(repo_path, ".git")
-    if not (os.path.isdir(git_dir) or os.path.isfile(git_dir)):
+    if not os.path.isdir(git_dir):
         raise ValueError(f"Path is not a git repository (no .git folder found): {repo_path}")
 
 def get_commit_message(repo_path: str, commit_hash: str) -> str:
