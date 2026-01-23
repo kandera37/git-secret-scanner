@@ -1,6 +1,6 @@
 # Git Secret Scanner
 
-Small CLI tool that scans the last N Git commits for potential hardcoded secrets (passwords, tokens, secrets) using regex + entropy and an LLm for secondary review.
+Small CLI tool that scans the last N Git commits for potential hardcoded secrets (passwords, tokens, API keys) using regex + entropy and an LLM for secondary review.
 
 ## Features
 
@@ -22,7 +22,7 @@ Small CLI tool that scans the last N Git commits for potential hardcoded secrets
 
 ## Installation
 
-Clone the repository and install Python dependencies (if any):
+Clone the repository and install Python dependencies:
 
 ```bash
 git clone https://github.com/kandera37/git-secret-scanner.git
@@ -71,7 +71,7 @@ python3 main.py \
   --out report.json
 ```
 
-Control which findings go to LLM:
+Control which findings are sent to the LLM:
 
 ```bash
 python main.py \
@@ -83,9 +83,9 @@ python main.py \
 
 Where:
 
-- `--min-confidence` — minimal confidence level **to skip** LLM review.
-    - Findings with `confidence` <= `min-confidence` are sent to the LLM.
-    - Valid values: low, medium, high.
+- `--min-confidence` — minimal confidence level to **skip** LLM review.
+    - Findings with `confidence` **<=** `min-confidence` are sent to the LLM.
+    - Valid values: `low`, `medium`, `high`.
 - `--llm-model` — OpenAI model name (default: gpt-4o-mini).
 
 ## Output format
