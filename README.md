@@ -25,41 +25,59 @@ Small CLI tool that scans the last N Git commits for potential hardcoded secrets
 Clone the repository and install Python dependencies (if any):
 
 ```bash
-git clone <YOUR_REPO_URL>
-cd <YOUR_REPO_DIR>
-# pip install -r requirements.txt  # optional, if you add dependencies later
+git clone https://github.com/kandera37/git-secret-scanner.git
+cd git-secret-scanner
+
+# (optional) create venv
+python -m venv .venv
+source .venv/bin/activate # Windows: .venv\Scripts\activate
+
+# install dependencies
+pip install -r requirements.txt
 ```
 
 ## Configuration
 
-The tool reads OpenAI settings from environment variables.
-You can use .env file (not commited to Git) based on .env.example:
+The tool uses OpenAI API for LLM-powered classification.
+
+Create a `.env` file in the project root (you can copy from .env.example):
+
+```bash
+cp .env.example .env
+```
 
 ```dotenv
 OPENAI_API_KEY=put_key_here
 OPENAI_MODEL=gpt-4o-mini
 ```
 
-By default, the code uses `gpt-4o-mini`, but you can override it via CLI.
-
 ## Usage
 
-Basic usage with a local repository:
+Scan last 3 commits of a local repo:
 
 ```bash
 python3 main.py \
-  --repo /path/to/local/repo \
+  --repo /path/to/repo \
+  --n 3 \
+  --out report.json
+```
+
+Scan a remote git URL:
+
+```bash
+python3 main.py \
+  --repo https://github.com/user/repo.git \
   --n 5 \
   --out report.json
 ```
 
-Usage with a remote Git URL:
+Control which findings go to LLM:
 
 ```bash
---repo /path/to/local/repo \
-  --n 5 \
-  --min-confidence medium \
-  --llm-model gpt-4o-mini \
+python main.py \
+  --repo . \
+  --n 10 \
+  --min-confidence low \
   --out report.json
 ```
 
