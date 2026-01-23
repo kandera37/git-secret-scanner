@@ -10,10 +10,10 @@ def get_last_commit_hash(repo_path: str) -> str:
     """
     result = subprocess.run(
         ["git", "log", "-1", "--pretty=format:%H"],
-        capture_output=True,
-        text=True,
-        cwd=repo_path,
-        check=True,
+        capture_output = True,
+        text = True,
+        cwd = repo_path,
+        check = True,
     )
     commit_hash = result.stdout.strip()
     return commit_hash
@@ -23,7 +23,7 @@ def get_last_n_commit_hashes(repo_path: str, n: int) -> list[str]:
     Return a list of hashes for the last n commits from the given repo.
     """
 
-    if n<=0:
+    if n <= 0:
         return []
     result = subprocess.run(
         ["git", "log", "-n", str(n), "--pretty=format:%H"],
@@ -97,7 +97,7 @@ def analyze_last_n_commits(repo_path: str, n: int) -> list[dict]:
 
 def ensure_valid_repo(repo_path: str) -> None:
     """
-    Validate that repo_path looks like a git repository (has a .git directory or git metadata file).
+    Validate that repo_path looks like a git repository (directory with a .git folder).
     Raise ValueError with a clear message if not.
     """
     if not os.path.isdir(repo_path):
