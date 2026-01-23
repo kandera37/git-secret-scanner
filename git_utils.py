@@ -10,10 +10,10 @@ def get_last_commit_hash(repo_path: str) -> str:
     """
     result = subprocess.run(
         ["git", "log", "-1", "--pretty=format:%H"],
-        capture_output = True,
-        text = True,
-        cwd = repo_path,
-        check = True,
+        capture_output=True,
+        text=True,
+        cwd=repo_path,
+        check=True,
     )
     commit_hash = result.stdout.strip()
     return commit_hash
@@ -27,10 +27,10 @@ def get_last_n_commit_hashes(repo_path: str, n: int) -> list[str]:
         return []
     result = subprocess.run(
         ["git", "log", "-n", str(n), "--pretty=format:%H"],
-        capture_output = True,
-        text = True,
-        cwd = repo_path,
-        check = True,
+        capture_output=True,
+        text=True,
+        cwd=repo_path,
+        check=True,
     )
     commits= result.stdout.strip().splitlines()
     return commits
@@ -41,10 +41,10 @@ def get_commit_diff(repo_path: str, commit_hash: str) -> str:
     """
     result= subprocess.run(
         ["git", "show", "--format=", "--patch", commit_hash],
-        cwd = repo_path,
-        capture_output = True,
-        text = True,
-        check= True
+        cwd=repo_path,
+        capture_output=True,
+        text=True,
+        check=True
     )
     diff_text = result.stdout
     return diff_text
@@ -54,7 +54,7 @@ def get_last_commit_diff(repo_path: str) -> tuple[str, str]:
     Returns (commit_hash, diff_text) for the last commit in the given repo.
     """
     commit_hash = get_last_commit_hash(repo_path)
-    diff_text= get_commit_diff(repo_path, commit_hash)
+    diff_text = get_commit_diff(repo_path, commit_hash)
     return commit_hash, diff_text
 
 def analyze_last_commit(repo_path: str) -> list[dict]:
@@ -113,10 +113,10 @@ def get_commit_message(repo_path: str, commit_hash: str) -> str:
     """
     result = subprocess.run(
         ["git", "show", "-s", "--format=%B", commit_hash],
-        cwd = repo_path,
-        capture_output = True,
-        text = True,
-        check = True
+        cwd=repo_path,
+        capture_output=True,
+        text=True,
+        check=True
     )
     return result.stdout.strip()
 
@@ -132,9 +132,9 @@ def prepare_repo(repo: str) -> tuple[str, tempfile.TemporaryDirectory | None]:
         try:
             subprocess.run(
                 ["git", "clone", repo,  local_path],
-                check = True,
-                capture_output = True,
-                text = True,
+                check=True,
+                capture_output=True,
+                text=True,
             )
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"failed to clone repo: {repo}\n{e.stderr}") from e

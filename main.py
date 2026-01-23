@@ -82,7 +82,7 @@ def main() -> None:
     }
 
     with open(args.out, "w", encoding="utf-8") as out_f:
-        json.dump(report, out_f, indent=2)
+        json.dump(report, out_f, indent=2, ensure_ascii=False)
     if final_findings:
         print(
             f"Wrote report to {args.out} "
