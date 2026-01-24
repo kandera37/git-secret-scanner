@@ -11,7 +11,12 @@ DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 class LLMDecision(BaseModel):
     id: str
     is_secret: bool
-    llm_type: str = Field(description='e.g. "hardcoded_password", "hardcoded_token", "hardcoded_secret", "not_a_secret"')
+    llm_type: str = Field(
+        description=(
+            'e.g. "hardcoded_password", "hardcoded_token", '
+            '"hardcoded_secret", "not_a_secret"'
+        )
+    )
     llm_confidence: Literal["low", "medium", "high"]
     llm_comment: str
 
@@ -23,29 +28,30 @@ def select_llm_candidates(
         min_confidence: str = "medium"
 ) -> list[dict]:
     """
-    Choose which findings should be sent to the LLM based on confidence.
+    Select findings that should be sent to the LLM based on confidence.
 
-    We map confidence levels to numbers:
+    Confidence levels are ordered as:
         low -> 0
         medium -> 1
         high -> 2
 
-    All findings with confidence level <= min_confidence will be sent to the LLM.
+    The `min_confidence` parameter defines the lowest confidence level
+    that will be considered "good enough" to skip LLM review.
+
+    All findings with confidence level strictly lower than `min_confidence`
+    (i.e. level < min_level) will be sent to the LLM.
     """
     llm_candidates: list[dict] = []
 
     order = {"low": 0, "medium": 1, "high": 2}
-
     min_level = order.get(min_confidence, order["medium"])
 
     for finding in findings:
-        raw_conf = finding.get("confidence", "medium")
-        conf = str(raw_conf).lower()
-        if conf not in order:
-            continue
-        level = order[conf]
-        if level <= min_level:
+        conf = str(finding.get("confidence", "medium")).lower()
+        level = order.get(conf)
+        if level is not None and level <= min_level:
             llm_candidates.append(finding)
+
     return llm_candidates
 
 def build_llm_payload(candidates: list[dict]) -> list[dict]:
