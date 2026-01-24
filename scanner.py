@@ -100,7 +100,7 @@ def scan_diff_for_passwords(diff_text: str, diff_source: str) -> list[dict]:
     Returns a list of finding dicts.
     """
     current_file = None
-    findings = []
+    findings: list[dict] = []
     for line_number, line in enumerate(diff_text.splitlines(), start=1):
         if line.startswith("+++ "):
             parts = line.split()
@@ -109,7 +109,7 @@ def scan_diff_for_passwords(diff_text: str, diff_source: str) -> list[dict]:
                 if path.startswith("b/"):
                     path = path[2:]
                 current_file = path
-        stripped= line.strip()
+        stripped = line.strip()
         if stripped.startswith("+") and not stripped.startswith("+++"):
             code_line = stripped[1:]
             for regex, pattern_name, finding_type in REGEX_PATTERNS:
@@ -124,7 +124,10 @@ def scan_diff_for_passwords(diff_text: str, diff_source: str) -> list[dict]:
                         "snippet": code_line,
                         "type": finding_type,
                         "confidence": confidence,
-                        "rationale": f"Added line in diff matches regex '{pattern_name}' (entropy= {entropy:.2f})"
+                        "rationale": (
+                            f"Added line in diff matches regex '{pattern_name}' "
+                            f"entropy= {entropy:.2f})"
+                        )
                     }
                     findings.append(finding)
                     break
